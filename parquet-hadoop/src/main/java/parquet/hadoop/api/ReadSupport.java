@@ -118,12 +118,21 @@ abstract public class ReadSupport<T> {
    */
   public static MessageType getSchemaForRead(MessageType fileMessageType, String partialReadSchemaString) {
   	MessageType forRead = fileMessageType;
-    if (partialReadSchemaString != null) {
-      MessageType requestedMessageType = MessageTypeParser.parseMessageType(partialReadSchemaString);
-      fileMessageType.checkContains(requestedMessageType);
-      forRead = requestedMessageType;
-    }
-    return forRead;
+	
+	if (partialReadSchemaString != null) {   
+	  MessageType requestedMessageType = null;
+	  for(String partialReadSchema : partialReadSchemaString.split("\\|")){
+			
+			requestedMessageType = MessageTypeParser.parseMessageType(partialReadSchema);
+			try{
+				fileMessageType.checkContains(requestedMessageType);
+				break;
+			}catch(Exception e){}
+	  }
+	  fileMessageType.checkContains(requestedMessageType); //final check
+	  forRead = requestedMessageType;
+        }
+        return forRead;
   }
 
 }
